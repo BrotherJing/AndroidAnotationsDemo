@@ -7,12 +7,22 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.brotherjing.aademo.beans.Word;
+
+import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
+import org.androidannotations.annotations.rest.RestService;
 
 @EActivity(R.layout.activity_main)
 public class MainActivity extends ActionBarActivity {
+
+    @RestService
+    RESTClient client;
+
+    Word word;
 
     @ViewById(R.id.et)
     EditText et;
@@ -22,7 +32,18 @@ public class MainActivity extends ActionBarActivity {
 
     @Click(R.id.btn)
     void btnClick(){
-        tv.setText(et.getText().toString());
+        searchWord(et.getText().toString());
+    }
+
+    @Background(id="task1")
+    void searchWord(String w){
+        word = client.getWord(w).getWord();
+        refreshView();
+    }
+
+    @UiThread
+    void refreshView(){
+        tv.setText(word.getPronunciation()+"\n"+word.getDefinition());
     }
 
     @Override
